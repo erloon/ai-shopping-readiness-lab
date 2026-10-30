@@ -132,6 +132,7 @@ app.MapPost("/api/validate-feed", async (HttpRequest request, CancellationToken 
 }).RequireRateLimiting("run");
 
 app.MapGet("/api/ai/models", () => Results.Ok(AiRanker.DefaultModels));
+// Provider failures use 422: a CDN in front of the lab may replace 5xx bodies with its own error page.
 app.MapPost("/api/ai/rank", async (AiRankRequest body, AiRanker ranker, CancellationToken ct) =>
 {
     if (!AiRanker.DefaultModels.ContainsKey(body.Provider)) return Results.BadRequest(new { error = "Choose openai, anthropic or gemini." });
@@ -157,15 +158,15 @@ app.MapPost("/api/ai/rank", async (AiRankRequest body, AiRanker ranker, Cancella
     }
     catch (AiProviderException ex)
     {
-        return Results.Json(new { error = $"Provider returned HTTP {ex.Status}.", detail = ex.Body }, statusCode: StatusCodes.Status502BadGateway);
+        return Results.Json(new { error = $"Provider returned HTTP {ex.Status}.", detail = ex.Body }, statusCode: StatusCodes.Status422UnprocessableEntity);
     }
     catch (TaskCanceledException)
     {
-        return Results.Json(new { error = "Provider timed out." }, statusCode: StatusCodes.Status504GatewayTimeout);
+        return Results.Json(new { error = "Provider timed out." }, statusCode: StatusCodes.Status422UnprocessableEntity);
     }
     catch (HttpRequestException ex)
     {
-        return Results.Json(new { error = "Could not reach provider: " + ex.Message }, statusCode: StatusCodes.Status502BadGateway);
+        return Results.Json(new { error = "Could not reach provider: " + ex.Message }, statusCode: StatusCodes.Status422UnprocessableEntity);
     }
 }).RequireRateLimiting("ai");
 
