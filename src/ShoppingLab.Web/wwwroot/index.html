@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AI Shopping Readiness Lab — can a shopping agent find the right product?</title>
+<title>AI Shopping Readiness Lab â€” can a shopping agent find the right product?</title>
 <meta name="description" content="Open-source .NET lab that audits a 100-SKU demo catalog: feed fields, JSON-LD Product/Offer, robots, sitemap, and 40 shopping queries before and after fixes.">
 <link rel="stylesheet" href="app.css">
 <script src="app.js" defer></script>
@@ -11,9 +11,9 @@
 <body>
 <header class="hero">
   <div class="wrap">
-    <p class="eyebrow">Proof of concept · demo data only</p>
+    <p class="eyebrow">Proof of concept Â· demo data only</p>
     <h1>AI Shopping Readiness Lab</h1>
-    <p class="lead">Can a shopping agent find <em>“niebieskie kredki 12 kolorów do 30 zł”</em> in a small online store? This lab audits a 100-SKU fictional catalog — feed, product pages, JSON-LD, robots.txt and sitemap — and measures 40 shopping queries <strong>before</strong> and <strong>after</strong> fixing the data.</p>
+    <p class="lead">Can a shopping agent find <em>â€śniebieskie kredki 12 kolorĂłw do 30 zĹ‚â€ť</em> in a small online store? This lab audits a 100-SKU fictional catalog â€” feed, product pages, JSON-LD, robots.txt and sitemap â€” and measures 40 shopping queries <strong>before</strong> and <strong>after</strong> fixing the data.</p>
     <div class="actions">
       <a class="btn primary" href="https://github.com/erloon/ai-shopping-readiness-lab" target="_blank" rel="noopener">
         <svg viewBox="0 0 16 16" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
@@ -42,14 +42,14 @@
 
   <section>
     <h2>Before vs after</h2>
-    <p class="muted" id="generated">Loading…</p>
+    <p class="muted" id="generated">Loadingâ€¦</p>
     <div class="table"><table id="kpis"><thead><tr><th>Metric</th><th>Before</th><th>After</th></tr></thead><tbody></tbody></table></div>
     <p class="muted">Before = the same ERP data with 17 documented, deliberately injected defects (stale feed snapshot, page and access problems). After = feed generated from the ERP and pages kept in sync.</p>
   </section>
 
   <section>
     <h2>Injected defects and what caught them</h2>
-    <div class="table"><table id="defects"><thead><tr><th>Code</th><th>Edge case</th><th>Defect</th><th>Layer</th><th>SKUs</th></tr></thead><tbody></tbody></table></div>
+    <div class="table"><table id="defects"><thead><tr><th>Code</th><th>Edge case</th><th>Defect · rules raised on these SKUs</th><th>Layer</th><th>SKUs</th></tr></thead><tbody></tbody></table></div>
   </section>
 
   <section>
@@ -69,7 +69,7 @@
 
   <section class="card" id="ai">
     <h2>Optional: compare with an LLM using your own key</h2>
-    <p>Send one golden-set query plus the eligible feed rows to a model of your choice and score its answer with the same answer key. <strong>Your key is sent only to this lab's server for this one request, forwarded to the provider and never stored or logged.</strong> You pay your provider for the tokens (≈ 8–10k input tokens per run). Model IDs change over time — edit the field if your account uses a different one.</p>
+    <p>Send one golden-set query plus the eligible feed rows to a model of your choice and score its answer with the same answer key. <strong>Your key is sent only to this lab's server for this one request, forwarded to the provider and never stored or logged.</strong> You pay your provider for the tokens (â‰ 8â€“10k input tokens per run). Model IDs change over time â€” edit the field if your account uses a different one.</p>
     <form id="aiForm" autocomplete="off">
       <div class="grid">
         <label>Provider
@@ -79,7 +79,7 @@
         <label>Scenario <select id="aiScenario"><option value="before">before</option><option value="after">after</option></select></label>
         <label>Query <select id="aiQuery"></select></label>
       </div>
-      <label>API key <input id="apiKey" type="password" required maxlength="300" autocomplete="off" spellcheck="false" placeholder="Your own key — not stored"></label>
+      <label>API key <input id="apiKey" type="password" required maxlength="300" autocomplete="off" spellcheck="false" placeholder="Your own key â€” not stored"></label>
       <button class="btn primary" type="submit" id="aiSubmit">Run comparison</button>
     </form>
     <div id="aiResult" class="result" hidden></div>
@@ -96,12 +96,12 @@
   <section>
     <h2>Data and reports</h2>
     <ul class="downloads">
-      <li><a href="shop/before/" target="_blank" rel="noopener">Demo shop — before</a> · <a href="shop/after/" target="_blank" rel="noopener">after</a></li>
-      <li><a href="shop/before/feed.jsonl">feed.jsonl (before)</a> · <a href="shop/after/feed.jsonl">feed.jsonl (after)</a></li>
+      <li><a href="shop/before/" target="_blank" rel="noopener">Demo shop â€” before</a> Â· <a href="shop/after/" target="_blank" rel="noopener">after</a></li>
+      <li><a href="shop/before/feed.jsonl">feed.jsonl (before)</a> Â· <a href="shop/after/feed.jsonl">feed.jsonl (after)</a></li>
       <li><a href="shop/after/catalog-erp.csv">catalog-erp.csv (ERP export, source of truth)</a></li>
-      <li><a href="report/before" target="_blank" rel="noopener">HTML report — before</a> · <a href="report/after" target="_blank" rel="noopener">after</a></li>
-      <li><a href="api/report/before.json">JSON report — before</a> · <a href="api/report/after.json">after</a></li>
-      <li><a href="api/metrics.csv">metrics.csv</a> · <a href="api/results.csv">results.csv</a> · <a href="api/golden-set.csv">golden-set.csv</a> · <a href="api/issues/before.csv">issues-before.csv</a></li>
+      <li><a href="report/before" target="_blank" rel="noopener">HTML report â€” before</a> Â· <a href="report/after" target="_blank" rel="noopener">after</a></li>
+      <li><a href="api/report/before.json">JSON report â€” before</a> Â· <a href="api/report/after.json">after</a></li>
+      <li><a href="api/metrics.csv">metrics.csv</a> Â· <a href="api/results.csv">results.csv</a> Â· <a href="api/golden-set.csv">golden-set.csv</a> Â· <a href="api/issues/before.csv">issues-before.csv</a></li>
     </ul>
   </section>
 
@@ -115,6 +115,6 @@
     </ul>
   </section>
 </main>
-<footer class="wrap muted">Built by <a href="https://sparkdata.pl" target="_blank" rel="noopener">Maciej Kryca · sparkdata.pl</a> · MIT license · <a href="https://github.com/erloon/ai-shopping-readiness-lab" target="_blank" rel="noopener">GitHub</a></footer>
+<footer class="wrap muted">Built by <a href="https://sparkdata.pl" target="_blank" rel="noopener">Maciej Kryca Â· sparkdata.pl</a> Â· MIT license Â· <a href="https://github.com/erloon/ai-shopping-readiness-lab" target="_blank" rel="noopener">GitHub</a></footer>
 </body>
 </html>
