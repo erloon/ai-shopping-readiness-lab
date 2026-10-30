@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/ShoppingLab.Core/ShoppingLab.Core.csproj" />
+    <Project Path="src/ShoppingLab.Web/ShoppingLab.Web.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/ShoppingLab.Tests/ShoppingLab.Tests.csproj" />
+  </Folder>
+</Solution>

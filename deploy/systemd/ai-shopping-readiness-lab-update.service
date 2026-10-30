@@ -1,0 +1,9 @@
+[Unit]
+Description=Pull and (re)deploy AI Shopping Readiness Lab container
+After=docker.service network-online.target
+Requires=docker.service
+
+[Service]
+Type=oneshot
+EnvironmentFile=/etc/ai-shopping-readiness-lab.env
+ExecStart=/usr/bin/bash /opt/ai-shopping-readiness-lab/pull-update.sh

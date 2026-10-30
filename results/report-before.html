@@ -1,0 +1,119 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Audit report: before | AI Shopping Readiness Lab</title><meta name="robots" content="noindex">
+<style>body{font-family:system-ui,sans-serif;max-width:1100px;margin:2rem auto;padding:0 1rem;color:#1a1a1a}
+table{border-collapse:collapse;width:100%;font-size:.85rem;margin:1rem 0}td,th{border:1px solid #ddd;padding:.3rem .5rem;text-align:left;vertical-align:top}
+th{background:#f3f4f6}.error{color:#a40000}.warning{color:#8a5a00}.kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:.5rem}
+.kpi div{background:#f3f4f6;border-radius:8px;padding:.6rem}.kpi b{display:block;font-size:1.4rem}</style></head><body>
+<p><a href="/ai-shopping-readiness-lab/">← AI Shopping Readiness Lab</a></p>
+<h1>Audit report — scenario “before”</h1><p>Before: stale feed snapshot, page and access defects. Generated 2026-10-30 13:20:20Z. Demo data only.</p>
+<div class="kpi">
+<div>Required-field completeness<b>99.5%</b></div><div>Feed rows / ERP SKUs<b>98 / 100</b></div>
+<div>Price/stock inconsistencies<b>14</b></div><div>Unreachable URLs<b>3</b></div>
+<div>Indexability problems<b>11</b></div><div>Errors / warnings<b>39 / 24</b></div>
+<div>Precision@3<b>0.817</b></div><div>Recall@5<b>0.81</b></div>
+<div>Queries meeting constraints<b>80%</b></div><div>Validation time<b>351 ms</b></div>
+</div>
+<h2>Issues (63)</h2><table><tr><th>SKU</th><th>Rule</th><th>Severity</th><th>Layer</th><th>Detail</th></tr><tr><td>KR-AKW-12-NIE</td><td title="Feed price differs from ERP price">CONS_PRICE_ERP</td><td class="error">error</td><td>consistency</td><td>feed 24.99 PLN, ERP 27.99 PLN</td></tr>
+<tr><td>KR-AKW-12-NIE</td><td title="Feed price differs from JSON-LD Offer on the page">CONS_PRICE_PAGE</td><td class="error">error</td><td>consistency</td><td>feed 24.99 PLN, page 27.99 PLN</td></tr>
+<tr><td>KR-MIN-FIO</td><td title="Product page carries meta robots noindex">PAGE_NOINDEX</td><td class="error">error</td><td>page</td><td>meta robots: noindex</td></tr>
+<tr><td>KR-MIN-ZIE</td><td title="SKU exists in ERP but is missing from the feed">FEED_MISSING_SKU</td><td class="error">error</td><td>feed</td><td>&#39;Kredki oł&#243;wkowe Kolorowo Mini 12 kolor&#243;w, etui zielone&#39; is sellable in ERP but absent from the feed</td></tr>
+<tr><td>KR-OLO-12-NIE</td><td title="Feed availability differs from ERP stock">CONS_AVAILABILITY_ERP</td><td class="error">error</td><td>consistency</td><td>feed in_stock, ERP stock 0</td></tr>
+<tr><td>KR-OLO-12-NIE</td><td title="Feed availability differs from JSON-LD Offer on the page">CONS_AVAILABILITY_PAGE</td><td class="error">error</td><td>consistency</td><td>feed in_stock, page out_of_stock</td></tr>
+<tr><td>KR-OLO-24-CZE</td><td title="Canonical URL differs from the feed URL">PAGE_CANONICAL</td><td class="error">error</td><td>page</td><td>canonical https://examples.sparkdata.pl/ai-shopping-readiness-lab/shop/before/products/kredki-olowkowe-kolorowo-24-kolorow-etui-niebieskie</td></tr>
+<tr><td>KR-OLO-36-NIE</td><td title="GTIN has an invalid length or check digit">FEED_GTIN</td><td class="error">error</td><td>feed</td><td>gtin &#39;2001000040002&#39;</td></tr>
+<tr><td>KR-SWI-12-CZE</td><td title="Product URL not listed in sitemap.xml">ACCESS_NOT_IN_SITEMAP</td><td class="warning">warning</td><td>access</td><td>https://examples.sparkdata.pl/ai-shopping-readiness-lab/shop/before/products/kredki-swiecowe-pastelka-12-kolorow-etui-czerwone</td></tr>
+<tr><td>KR-SWI-12-NIE</td><td title="Product URL not listed in sitemap.xml">ACCESS_NOT_IN_SITEMAP</td><td class="warning">warning</td><td>access</td><td>https://examples.sparkdata.pl/ai-shopping-readiness-lab/shop/before/products/kredki-swiecowe-pastelka-12-kolorow-etui-niebieskie</td></tr>
+<tr><td>KR-SWI-12-ZOL</td><td title="Product URL not listed in sitemap.xml">ACCESS_NOT_IN_SITEMAP</td><td class="warning">warning</td><td>access</td><td>https://examples.sparkdata.pl/ai-shopping-readiness-lab/shop/before/products/kredki-swiecowe-pastelka-12-kolorow-etui-zolte</td></tr>
+<tr><td>KR-SWI-24-CZE</td><td title="Product URL not listed in sitemap.xml">ACCESS_NOT_IN_SITEMAP</td><td class="warning">warning</td><td>access</td><td>https://examples.sparkdata.pl/ai-shopping-readiness-lab/shop/before/products/kredki-swiecowe-pastelka-24-kolorow-etui-czerwone</td></tr>
+<tr><td>KR-SWI-24-NIE</td><td title="Product URL not listed in sitemap.xml">ACCESS_NOT_IN_SITEMAP</td><td class="warning">warning</td><td>access</td><td>https://examples.sparkdata.pl/ai-shopping-readiness-lab/shop/before/products/kredki-swiecowe-pastelka-24-kolorow-etui-niebieskie</td></tr>
+<tr><td>KR-SWI-24-ZOL</td><td title="Product URL not listed in sitemap.xml">ACCESS_NOT_IN_SITEMAP</td><td class="warning">warning</td><td>access</td><td>https://examples.sparkdata.pl/ai-shopping-readiness-lab/shop/before/products/kredki-swiecowe-pastelka-24-kolorow-etui-zolte</td></tr>
+<tr><td>KR-SWI-24-ZOL</td><td title="Feed price differs from ERP price">CONS_PRICE_ERP</td><td class="error">error</td><td>consistency</td><td>feed 24.99 EUR, ERP 24.99 PLN</td></tr>
+<tr><td>KR-SWI-24-ZOL</td><td title="Feed price differs from JSON-LD Offer on the page">CONS_PRICE_PAGE</td><td class="error">error</td><td>consistency</td><td>feed 24.99 EUR, page 24.99 PLN</td></tr>
+<tr><td>KR-SWI-24-ZOL</td><td title="Currency differs from the shop currency (PLN)">FEED_CURRENCY</td><td class="error">error</td><td>feed</td><td>price &#39;24.99 EUR&#39; (shop currency PLN)</td></tr>
+<tr><td>KU-BIU-NIE</td><td title="item_id is not unique">FEED_DUPLICATE_ID</td><td class="error">error</td><td>feed</td><td>item_id &#39;KU-BIU-NIE&#39; already used by an earlier row (row 72)</td></tr>
+<tr><td>KU-BIU-SZA</td><td title="SKU exists in ERP but is missing from the feed">FEED_MISSING_SKU</td><td class="error">error</td><td>feed</td><td>&#39;Kubek z pokrywką Biuro 350 ml, szary&#39; is sellable in ERP but absent from the feed</td></tr>
+<tr><td>KU-EMA-BIA</td><td title="robots.txt disallows the product URL">ACCESS_ROBOTS_BLOCKED</td><td class="error">error</td><td>access</td><td>/ai-shopping-readiness-lab/shop/before/products/kubek-emaliowany-ognisko-400-ml-bialy</td></tr>
+<tr><td>KU-EMA-CZA</td><td title="robots.txt disallows the product URL">ACCESS_ROBOTS_BLOCKED</td><td class="error">error</td><td>access</td><td>/ai-shopping-readiness-lab/shop/before/products/kubek-emaliowany-ognisko-400-ml-czarny</td></tr>
+<tr><td>KU-EMA-CZE</td><td title="robots.txt disallows the product URL">ACCESS_ROBOTS_BLOCKED</td><td class="error">error</td><td>access</td><td>/ai-shopping-readiness-lab/shop/before/products/kubek-emaliowany-ognisko-400-ml-czerwony</td></tr>
+<tr><td>KU-EMA-NIE</td><td title="robots.txt disallows the product URL">ACCESS_ROBOTS_BLOCKED</td><td class="error">error</td><td>access</td><td>/ai-shopping-readiness-lab/shop/before/products/kubek-emaliowany-ognisko-400-ml-niebieski</td></tr>
+<tr><td>KU-EMA-ZIE</td><td title="robots.txt disallows the product URL">ACCESS_ROBOTS_BLOCKED</td><td class="error">error</td><td>access</td><td>/ai-shopping-readiness-lab/shop/before/products/kubek-emaliowany-ognisko-400-ml-zielony</td></tr>
+<tr><td>KU-EMA-ZIE</td><td title="image_url does not return an image with HTTP 200">IMAGE_UNREACHABLE</td><td class="error">error</td><td>access</td><td>HTTP 404 https://examples.sparkdata.pl/ai-shopping-readiness-lab/shop/before/images/kubek-ognisko-zielony.png</td></tr>
+<tr><td>KU-POR-300-BIA</td><td title="sale_price is not lower than price or uses another currency">FEED_SALE_PRICE</td><td class="warning">warning</td><td>feed</td><td>sale_price &#39;31.99 PLN&#39; vs price &#39;29.99 PLN&#39;</td></tr>
+<tr><td>KU-POR-450-NIE</td><td title="Feed availability differs from ERP stock">CONS_AVAILABILITY_ERP</td><td class="error">error</td><td>consistency</td><td>feed in_stock, ERP stock 0</td></tr>
+<tr><td>KU-POR-450-NIE</td><td title="Feed availability differs from JSON-LD Offer on the page">CONS_AVAILABILITY_PAGE</td><td class="error">error</td><td>consistency</td><td>feed in_stock, page out_of_stock</td></tr>
+<tr><td>KU-TER-350-CZE</td><td title="Product URL not listed in sitemap.xml">ACCESS_NOT_IN_SITEMAP</td><td class="warning">warning</td><td>access</td><td>https://examples.sparkdata.pl/ai-shopping-readiness-lab/shop/before/products/kubek-termo-350-czarny-stary</td></tr>
+<tr><td>KU-TER-350-CZE</td><td title="Product URL does not return HTTP 200">PAGE_HTTP_STATUS</td><td class="error">error</td><td>page</td><td>HTTP 404 https://examples.sparkdata.pl/ai-shopping-readiness-lab/shop/before/products/kubek-termo-350-czarny-stary</td></tr>
+<tr><td>KU-TER-350-NIE</td><td title="Feed price differs from ERP price">CONS_PRICE_ERP</td><td class="error">error</td><td>consistency</td><td>feed 59.00 PLN, ERP 69.00 PLN</td></tr>
+<tr><td>KU-TER-350-NIE</td><td title="Feed price differs from JSON-LD Offer on the page">CONS_PRICE_PAGE</td><td class="error">error</td><td>consistency</td><td>feed 59.00 PLN, page 69.00 PLN</td></tr>
+<tr><td>PL-MAL-ROZ</td><td title="One of the 9 required feed fields is missing or empty">FEED_REQUIRED_MISSING</td><td class="error">error</td><td>feed</td><td>brand is empty</td></tr>
+<tr><td>PL-SZC-30-CZA</td><td title="GTIN has an invalid length or check digit">FEED_GTIN</td><td class="error">error</td><td>feed</td><td>gtin &#39;2001000370000&#39;</td></tr>
+<tr><td>PL-SZC-30-NIE</td><td title="Canonical URL differs from the feed URL">PAGE_CANONICAL</td><td class="error">error</td><td>page</td><td>canonical https://examples.sparkdata.pl/ai-shopping-readiness-lab/shop/before/products/plecak-turystyczny-szczyt-40-l-niebieski</td></tr>
+<tr><td>PL-TRK-SZA</td><td title="JSON-LD Product has no Offer (price, currency, availability)">JSONLD_OFFER_MISSING</td><td class="error">error</td><td>page</td><td>Product without offers</td></tr>
+<tr><td>PL-TRK-ZIE</td><td title="Feed availability differs from ERP stock">CONS_AVAILABILITY_ERP</td><td class="error">error</td><td>consistency</td><td>feed in_stock, ERP stock 0</td></tr>
+<tr><td>PL-TRK-ZIE</td><td title="Feed availability differs from JSON-LD Offer on the page">CONS_AVAILABILITY_PAGE</td><td class="error">error</td><td>consistency</td><td>feed in_stock, page out_of_stock</td></tr>
+<tr><td>PL-URB-CZA</td><td title="Feed title differs from JSON-LD Product name">CONS_TITLE_PAGE</td><td class="warning">warning</td><td>consistency</td><td>feed &#39;Plecak miejski Urbano 25 l&#39;, page &#39;Plecak miejski Urbano 25 l, czarny&#39;</td></tr>
+<tr><td>PL-URB-CZA</td><td title="Several rows share an identical title">FEED_DUPLICATE_TITLE</td><td class="warning">warning</td><td>feed</td><td>&#39;Plecak miejski Urbano 25 l&#39; used by 5 rows</td></tr>
+<tr><td>PL-URB-CZA</td><td title="Variant rows lack group_id / listing_has_variations / variant_dict">FEED_VARIANT_DATA</td><td class="warning">warning</td><td>feed</td><td>Same title as other rows but no variant attributes to tell them apart</td></tr>
+<tr><td>PL-URB-FIO</td><td title="Feed title differs from JSON-LD Product name">CONS_TITLE_PAGE</td><td class="warning">warning</td><td>consistency</td><td>feed &#39;Plecak miejski Urbano 25 l&#39;, page &#39;Plecak miejski Urbano 25 l, fioletowy&#39;</td></tr>
+<tr><td>PL-URB-FIO</td><td title="Several rows share an identical title">FEED_DUPLICATE_TITLE</td><td class="warning">warning</td><td>feed</td><td>&#39;Plecak miejski Urbano 25 l&#39; used by 5 rows</td></tr>
+<tr><td>PL-URB-FIO</td><td title="Variant rows lack group_id / listing_has_variations / variant_dict">FEED_VARIANT_DATA</td><td class="warning">warning</td><td>feed</td><td>Same title as other rows but no variant attributes to tell them apart</td></tr>
+<tr><td>PL-URB-NIE</td><td title="Feed price differs from ERP price">CONS_PRICE_ERP</td><td class="error">error</td><td>consistency</td><td>feed 149.00 PLN, ERP 179.00 PLN</td></tr>
+<tr><td>PL-URB-NIE</td><td title="Feed price differs from JSON-LD Offer on the page">CONS_PRICE_PAGE</td><td class="error">error</td><td>consistency</td><td>feed 149.00 PLN, page 179.00 PLN</td></tr>
+<tr><td>PL-URB-NIE</td><td title="Feed title differs from JSON-LD Product name">CONS_TITLE_PAGE</td><td class="warning">warning</td><td>consistency</td><td>feed &#39;Plecak miejski Urbano 25 l&#39;, page &#39;Plecak miejski Urbano 25 l, niebieski&#39;</td></tr>
+<tr><td>PL-URB-NIE</td><td title="Several rows share an identical title">FEED_DUPLICATE_TITLE</td><td class="warning">warning</td><td>feed</td><td>&#39;Plecak miejski Urbano 25 l&#39; used by 5 rows</td></tr>
+<tr><td>PL-URB-NIE</td><td title="Variant rows lack group_id / listing_has_variations / variant_dict">FEED_VARIANT_DATA</td><td class="warning">warning</td><td>feed</td><td>Same title as other rows but no variant attributes to tell them apart</td></tr>
+<tr><td>PL-URB-SZA</td><td title="Feed title differs from JSON-LD Product name">CONS_TITLE_PAGE</td><td class="warning">warning</td><td>consistency</td><td>feed &#39;Plecak miejski Urbano 25 l&#39;, page &#39;Plecak miejski Urbano 25 l, szary&#39;</td></tr>
+<tr><td>PL-URB-SZA</td><td title="Several rows share an identical title">FEED_DUPLICATE_TITLE</td><td class="warning">warning</td><td>feed</td><td>&#39;Plecak miejski Urbano 25 l&#39; used by 5 rows</td></tr>
+<tr><td>PL-URB-SZA</td><td title="Variant rows lack group_id / listing_has_variations / variant_dict">FEED_VARIANT_DATA</td><td class="warning">warning</td><td>feed</td><td>Same title as other rows but no variant attributes to tell them apart</td></tr>
+<tr><td>PL-URB-ZIE</td><td title="Feed title differs from JSON-LD Product name">CONS_TITLE_PAGE</td><td class="warning">warning</td><td>consistency</td><td>feed &#39;Plecak miejski Urbano 25 l&#39;, page &#39;Plecak miejski Urbano 25 l, zielony&#39;</td></tr>
+<tr><td>PL-URB-ZIE</td><td title="Several rows share an identical title">FEED_DUPLICATE_TITLE</td><td class="warning">warning</td><td>feed</td><td>&#39;Plecak miejski Urbano 25 l&#39; used by 5 rows</td></tr>
+<tr><td>PL-URB-ZIE</td><td title="Variant rows lack group_id / listing_has_variations / variant_dict">FEED_VARIANT_DATA</td><td class="warning">warning</td><td>feed</td><td>Same title as other rows but no variant attributes to tell them apart</td></tr>
+<tr><td>ZE-A4K-NIE</td><td title="Product page carries meta robots noindex">PAGE_NOINDEX</td><td class="error">error</td><td>page</td><td>meta robots: noindex</td></tr>
+<tr><td>ZE-A4L-60-NIE</td><td title="JSON-LD Product has no Offer (price, currency, availability)">JSONLD_OFFER_MISSING</td><td class="error">error</td><td>page</td><td>Product without offers</td></tr>
+<tr><td>ZE-A4L-96-ZIE</td><td title="price is not &#39;amount CURRENCY&#39; with a decimal point">FEED_PRICE_FORMAT</td><td class="error">error</td><td>feed</td><td>price &#39;10,99 zĹ‚&#39;</td></tr>
+<tr><td>ZE-A5K-32-CZE</td><td title="One of the 9 required feed fields is missing or empty">FEED_REQUIRED_MISSING</td><td class="error">error</td><td>feed</td><td>image_url is empty</td></tr>
+<tr><td>ZE-A5K-60-NIE</td><td title="Product URL not listed in sitemap.xml">ACCESS_NOT_IN_SITEMAP</td><td class="warning">warning</td><td>access</td><td>https://examples.sparkdata.pl/ai-shopping-readiness-lab/shop/before/products/zeszyt-notio-a5-60-niebieski-old</td></tr>
+<tr><td>ZE-A5K-60-NIE</td><td title="Product URL does not return HTTP 200">PAGE_HTTP_STATUS</td><td class="error">error</td><td>page</td><td>HTTP 404 https://examples.sparkdata.pl/ai-shopping-readiness-lab/shop/before/products/zeszyt-notio-a5-60-niebieski-old</td></tr>
+<tr><td>ZE-A6D-NIE</td><td title="SKU exists in ERP but is missing from the feed">FEED_MISSING_SKU</td><td class="error">error</td><td>feed</td><td>&#39;Notes A6 w kropki Kropka 80 kartek, okładka niebieska&#39; is sellable in ERP but absent from the feed</td></tr>
+<tr><td>ZE-A6D-SZA</td><td title="One of the 9 required feed fields is missing or empty">FEED_REQUIRED_MISSING</td><td class="error">error</td><td>feed</td><td>description is empty</td></tr>
+</table><h2>Golden-set queries</h2><table><tr><th>ID</th><th>Query</th><th>Expected</th><th>Returned</th><th>P@3</th><th>R@5</th><th>OK</th><th>Violations</th></tr><tr><td>Q01</td><td>niebieskie kredki 12 kolor&#243;w do 30 zł</td><td>KR-AKW-12-NIE, KR-MIN-NIE, KR-SWI-12-NIE</td><td>KR-MIN-NIE, KR-SWI-12-NIE, KR-OLO-12-NIE, KR-AKW-12-NIE</td><td>0.667</td><td>1</td><td>✘</td><td>KR-OLO-12-NIE: actually out of stock</td></tr>
+<tr><td>Q02</td><td>kredki akwarelowe 24 kolory</td><td>KR-AKW-24-NIE, KR-AKW-24-ZIE</td><td>KR-AKW-24-NIE, KR-AKW-24-ZIE</td><td>1</td><td>1</td><td>✔</td><td></td></tr>
+<tr><td>Q03</td><td>tanie kredki świecowe do 20 zł</td><td>KR-SWI-12-CZE, KR-SWI-12-NIE, KR-SWI-12-ZOL</td><td>KR-SWI-12-CZE, KR-SWI-12-NIE, KR-SWI-12-ZOL</td><td>1</td><td>1</td><td>✔</td><td></td></tr>
+<tr><td>Q04</td><td>kredki 36 kolor&#243;w w niebieskim etui</td><td>KR-AKW-36-NIE, KR-OLO-36-NIE</td><td>KR-OLO-36-NIE, KR-AKW-36-NIE</td><td>1</td><td>1</td><td>✔</td><td></td></tr>
+<tr><td>Q05</td><td>kredki oł&#243;wkowe 24 kolory czerwone etui do 40 zł</td><td>KR-OLO-24-CZE</td><td>KR-OLO-24-CZE</td><td>1</td><td>1</td><td>✔</td><td></td></tr>
+<tr><td>Q06</td><td>r&#243;żowe kredki dla dziecka</td><td>KR-MIN-ROZ</td><td>KR-MIN-ROZ</td><td>1</td><td>1</td><td>✔</td><td></td></tr>
+<tr><td>Q07</td><td>kredki w ż&#243;łtym etui</td><td>KR-MIN-ZOL, KR-SWI-12-ZOL, KR-SWI-24-ZOL</td><td>KR-MIN-ZOL, KR-SWI-12-ZOL, KR-SWI-24-ZOL</td><td>1</td><td>1</td><td>✔</td><td></td></tr>
+<tr><td>Q08</td><td>zielone kredki akwarelowe 36 kolor&#243;w</td><td></td><td></td><td>1</td><td>1</td><td>✔</td><td></td></tr>
+<tr><td>Q09</td><td>kredki fioletowe 12 kolor&#243;w</td><td>KR-MIN-FIO</td><td>KR-MIN-FIO</td><td>1</td><td>1</td><td>✔</td><td></td></tr>
+<tr><td>Q10</td><td>zestaw kredek 24 kolory do 30 zł</td><td>KR-SWI-24-CZE, KR-SWI-24-NIE, KR-SWI-24-ZOL</td><td>KR-SWI-24-CZE, KR-SWI-24-NIE</td><td>1</td><td>0.667</td><td>✔</td><td></td></tr>
+<tr><td>Q11</td><td>niebieski plecak szkolny</td><td>PL-TRK-NIE</td><td>PL-TRK-NIE</td><td>1</td><td>1</td><td>✔</td><td></td></tr>
+<tr><td>Q12</td><td>zielony plecak szkolny 20 l</td><td></td><td>PL-TRK-ZIE</td><td>0</td><td>0</td><td>✘</td><td>PL-TRK-ZIE: actually out of stock</td></tr>
+<tr><td>Q13</td><td>plecak miejski czarny do 200 zł</td><td>PL-URB-CZA</td><td>PL-URB-CZA</td><td>1</td><td>1</td><td>✔</td><td></td></tr>
+<tr><td>Q14</td><td>plecak turystyczny 40 litr&#243;w</td><td>PL-SZC-40-CZA, PL-SZC-40-CZE, PL-SZC-40-ZIE</td><td>PL-SZC-40-CZA, PL-SZC-40-CZE, PL-SZC-40-ZIE</td><td>1</td><td>1</td><td>✔</td><td></td></tr>
+<tr><td>Q15</td><td>plecak turystyczny niebieski 30 l</td><td>PL-SZC-30-NIE</td><td>PL-SZC-30-NIE</td><td>1</td><td>1</td><td>✔</td><td></td></tr>
+<tr><td>Q16</td><td>plecak dla przedszkolaka r&#243;żowy</td><td>PL-MAL-ROZ</td><td></td><td>0</td><td>0</td><td>✘</td><td>no result although matching products exist</td></tr>
+<tr><td>Q17</td><td>szary plecak miejski</td><td>PL-URB-SZA</td><td>PL-URB-SZA</td><td>1</td><td>1</td><td>✔</td><td></td></tr>
+<tr><td>Q18</td><td>plecak do 100 zł</td><td>PL-MAL-CZE, PL-MAL-FIO, PL-MAL-NIE, PL-MAL-ROZ, PL-MAL-ZIE, PL-MAL-ZOL</td><td>PL-MAL-CZE, PL-MAL-FIO, PL-MAL-NIE, PL-MAL-ZIE, PL-MAL-ZOL</td><td>1</td><td>1</td><td>✔</td><td></td></tr>
+<tr><td>Q19</td><td>fioletowy plecak</td><td>PL-MAL-FIO</td><td>PL-MAL-FIO</td><td>1</td><td>1</td><td>✔</td><td></td></tr>
+<tr><td>Q20</td><td>czerwony plecak turystyczny do 230 zł</td><td>PL-SZC-30-CZE</td><td>PL-SZC-30-CZE</td><td>1</td><td>1</td><td>✔</td><td></td></tr>
+<tr><td>Q21</td><td>niebieski kubek ceramiczny 450 ml</td><td></td><td>KU-POR-450-NIE</td><td>0</td><td>0</td><td>✘</td><td>KU-POR-450-NIE: actually out of stock</td></tr>
+<tr><td>Q22</td><td>kubek termiczny 500 ml</td><td>KU-TER-500-CZE, KU-TER-500-NIE, KU-TER-500-SRE</td><td>KU-TER-500-CZE, KU-TER-500-NIE, KU-TER-500-SRE</td><td>1</td><td>1</td><td>✔</td><td></td></tr>
+<tr><td>Q23</td><td>kubek termiczny niebieski do 70 zł</td><td>KU-TER-350-NIE</td><td>KU-TER-350-NIE</td><td>1</td><td>1</td><td>✔</td><td></td></tr>
+<tr><td>Q24</td><td>biały kubek ceramiczny</td><td>KU-POR-300-BIA, KU-POR-450-BIA</td><td>KU-POR-300-BIA, KU-POR-450-BIA</td><td>1</td><td>1</td><td>✔</td><td></td></tr>
+<tr><td>Q25</td><td>kubek emaliowany zielony</td><td>KU-EMA-ZIE</td><td>KU-EMA-ZIE</td><td>1</td><td>1</td><td>✔</td><td></td></tr>
+<tr><td>Q26</td><td>kubek z pokrywką do biura</td><td>KU-BIU-BIA, KU-BIU-CZA, KU-BIU-NIE, KU-BIU-SZA</td><td></td><td>0</td><td>0</td><td>✘</td><td>no result although matching products exist</td></tr>
+<tr><td>Q27</td><td>czarny kubek do 40 zł</td><td>KU-EMA-CZA, KU-POR-300-CZA, KU-POR-450-CZA</td><td>KU-POR-300-CZA, KU-POR-450-CZA, KU-EMA-CZA</td><td>1</td><td>1</td><td>✔</td><td></td></tr>
+<tr><td>Q28</td><td>srebrny kubek termiczny 350 ml</td><td>KU-TER-350-SRE</td><td>KU-TER-350-SRE</td><td>1</td><td>1</td><td>✔</td><td></td></tr>
+<tr><td>Q29</td><td>szary kubek z pokrywką</td><td>KU-BIU-SZA</td><td></td><td>0</td><td>0</td><td>✘</td><td>no result although matching products exist</td></tr>
+<tr><td>Q30</td><td>kubek 300 ml zielony</td><td>KU-POR-300-ZIE</td><td>KU-POR-300-ZIE</td><td>1</td><td>1</td><td>✔</td><td></td></tr>
+<tr><td>Q31</td><td>zeszyt A5 w kratkę 60 kartek</td><td>ZE-A5K-60-CZE, ZE-A5K-60-NIE, ZE-A5K-60-ZIE</td><td>ZE-A5K-60-CZE, ZE-A5K-60-NIE, ZE-A5K-60-ZIE</td><td>1</td><td>1</td><td>✔</td><td></td></tr>
+<tr><td>Q32</td><td>niebieski zeszyt A4 w linie</td><td>ZE-A4L-60-NIE, ZE-A4L-96-NIE</td><td>ZE-A4L-60-NIE, ZE-A4L-96-NIE</td><td>1</td><td>1</td><td>✔</td><td></td></tr>
+<tr><td>Q33</td><td>notes A6 w kropki r&#243;żowy</td><td></td><td></td><td>1</td><td>1</td><td>✔</td><td></td></tr>
+<tr><td>Q34</td><td>zeszyt A5 32 kartki do 5 zł</td><td>ZE-A5K-32-CZE, ZE-A5K-32-NIE, ZE-A5K-32-ZIE, ZE-A5K-32-ZOL</td><td>ZE-A5K-32-NIE, ZE-A5K-32-ZIE, ZE-A5K-32-ZOL</td><td>1</td><td>0.75</td><td>✔</td><td></td></tr>
+<tr><td>Q35</td><td>zielony zeszyt A4 96 kartek</td><td>ZE-A4L-96-ZIE</td><td></td><td>0</td><td>0</td><td>✘</td><td>no result although matching products exist</td></tr>
+<tr><td>Q36</td><td>kołozeszyt A4 w kratkę niebieski</td><td>ZE-A4K-NIE</td><td>ZE-A4K-NIE</td><td>1</td><td>1</td><td>✔</td><td></td></tr>
+<tr><td>Q37</td><td>notes w kropki niebieski</td><td>ZE-A6D-NIE</td><td></td><td>0</td><td>0</td><td>✘</td><td>no result although matching products exist</td></tr>
+<tr><td>Q38</td><td>czerwony zeszyt w linie 60 kartek</td><td>ZE-A4L-60-CZE</td><td>ZE-A4L-60-CZE</td><td>1</td><td>1</td><td>✔</td><td></td></tr>
+<tr><td>Q39</td><td>ż&#243;łty zeszyt do 4 zł</td><td>ZE-A5K-32-ZOL</td><td>ZE-A5K-32-ZOL</td><td>1</td><td>1</td><td>✔</td><td></td></tr>
+<tr><td>Q40</td><td>zeszyt w kratkę czarny</td><td>ZE-A4K-CZA</td><td>ZE-A4K-CZA</td><td>1</td><td>1</td><td>✔</td><td></td></tr>
+</table></body></html>

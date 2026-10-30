@@ -1,0 +1,41 @@
+query_id,query,constraints,expected_skus,note
+Q01,niebieskie kredki 12 kolorów do 30 zł,category=kredki; color=niebieski; max_price=30 PLN; liczba_kolorow=12; in_stock,KR-AKW-12-NIE KR-MIN-NIE KR-SWI-12-NIE,Budget + color + pack size; one matching variant is sold out
+Q02,kredki akwarelowe 24 kolory,category=kredki; kind=akwarelowe; liczba_kolorow=24; in_stock,KR-AKW-24-NIE KR-AKW-24-ZIE,
+Q03,tanie kredki świecowe do 20 zł,category=kredki; kind=swiecowe; max_price=20 PLN; in_stock,KR-SWI-12-CZE KR-SWI-12-NIE KR-SWI-12-ZOL,
+Q04,kredki 36 kolorów w niebieskim etui,category=kredki; color=niebieski; liczba_kolorow=36; in_stock,KR-AKW-36-NIE KR-OLO-36-NIE,Inflected color (niebieskim)
+Q05,kredki ołówkowe 24 kolory czerwone etui do 40 zł,category=kredki; kind=olowkowe; color=czerwony; max_price=40 PLN; liczba_kolorow=24; in_stock,KR-OLO-24-CZE,
+Q06,różowe kredki dla dziecka,category=kredki; color=rozowy; in_stock,KR-MIN-ROZ,
+Q07,kredki w żółtym etui,category=kredki; color=zolty; in_stock,KR-MIN-ZOL KR-SWI-12-ZOL KR-SWI-24-ZOL,
+Q08,zielone kredki akwarelowe 36 kolorów,category=kredki; kind=akwarelowe; color=zielony; liczba_kolorow=36; in_stock,,Only match is sold out: correct answer is no result
+Q09,kredki fioletowe 12 kolorów,category=kredki; color=fioletowy; liczba_kolorow=12; in_stock,KR-MIN-FIO,
+Q10,zestaw kredek 24 kolory do 30 zł,category=kredki; max_price=30 PLN; liczba_kolorow=24; in_stock,KR-SWI-24-CZE KR-SWI-24-NIE KR-SWI-24-ZOL,
+Q11,niebieski plecak szkolny,category=plecaki; kind=szkolny; color=niebieski; in_stock,PL-TRK-NIE,Must not return pre-school backpacks
+Q12,zielony plecak szkolny 20 l,category=plecaki; kind=szkolny; color=zielony; pojemnosc_l=20; in_stock,,Only match is sold out
+Q13,plecak miejski czarny do 200 zł,category=plecaki; kind=miejski; color=czarny; max_price=200 PLN; in_stock,PL-URB-CZA,Variant titles collapsed in 'before'
+Q14,plecak turystyczny 40 litrów,category=plecaki; kind=turystyczny; pojemnosc_l=40; in_stock,PL-SZC-40-CZA PL-SZC-40-CZE PL-SZC-40-ZIE,
+Q15,plecak turystyczny niebieski 30 l,category=plecaki; kind=turystyczny; color=niebieski; pojemnosc_l=30; in_stock,PL-SZC-30-NIE,Wrong canonical in 'before'
+Q16,plecak dla przedszkolaka różowy,category=plecaki; kind=przedszkolny; color=rozowy; in_stock,PL-MAL-ROZ,Brand missing in 'before'
+Q17,szary plecak miejski,category=plecaki; kind=miejski; color=szary; in_stock,PL-URB-SZA,
+Q18,plecak do 100 zł,category=plecaki; max_price=100 PLN; in_stock,PL-MAL-CZE PL-MAL-FIO PL-MAL-NIE PL-MAL-ROZ PL-MAL-ZIE PL-MAL-ZOL,
+Q19,fioletowy plecak,category=plecaki; color=fioletowy; in_stock,PL-MAL-FIO,
+Q20,czerwony plecak turystyczny do 230 zł,category=plecaki; kind=turystyczny; color=czerwony; max_price=230 PLN; in_stock,PL-SZC-30-CZE,
+Q21,niebieski kubek ceramiczny 450 ml,category=kubki; kind=ceramiczny; color=niebieski; pojemnosc_ml=450; in_stock,,Only match is sold out but feed says in_stock in 'before'
+Q22,kubek termiczny 500 ml,category=kubki; kind=termiczny; pojemnosc_ml=500; in_stock,KU-TER-500-CZE KU-TER-500-NIE KU-TER-500-SRE,
+Q23,kubek termiczny niebieski do 70 zł,category=kubki; kind=termiczny; color=niebieski; max_price=70 PLN; in_stock,KU-TER-350-NIE,Stale feed price
+Q24,biały kubek ceramiczny,category=kubki; kind=ceramiczny; color=bialy; in_stock,KU-POR-300-BIA KU-POR-450-BIA,Invalid sale_price in 'before'
+Q25,kubek emaliowany zielony,category=kubki; kind=emaliowany; color=zielony; in_stock,KU-EMA-ZIE,Missing image + robots block in 'before'
+Q26,kubek z pokrywką do biura,category=kubki; kind=z pokrywka; in_stock,KU-BIU-BIA KU-BIU-CZA KU-BIU-NIE KU-BIU-SZA,Ambiguous category in 'before'
+Q27,czarny kubek do 40 zł,category=kubki; color=czarny; max_price=40 PLN; in_stock,KU-EMA-CZA KU-POR-300-CZA KU-POR-450-CZA,
+Q28,srebrny kubek termiczny 350 ml,category=kubki; kind=termiczny; color=srebrny; pojemnosc_ml=350; in_stock,KU-TER-350-SRE,
+Q29,szary kubek z pokrywką,category=kubki; kind=z pokrywka; color=szary; in_stock,KU-BIU-SZA,Duplicate item_id hides this SKU in 'before'
+Q30,kubek 300 ml zielony,category=kubki; color=zielony; pojemnosc_ml=300; in_stock,KU-POR-300-ZIE,
+Q31,zeszyt A5 w kratkę 60 kartek,category=zeszyty; format=A5; liniatura=kratka; kartki=60; in_stock,ZE-A5K-60-CZE ZE-A5K-60-NIE ZE-A5K-60-ZIE,
+Q32,niebieski zeszyt A4 w linie,category=zeszyty; color=niebieski; format=A4; liniatura=linia; in_stock,ZE-A4L-60-NIE ZE-A4L-96-NIE,JSON-LD without offer in 'before'
+Q33,notes A6 w kropki różowy,category=zeszyty; color=rozowy; format=A6; liniatura=kropki; in_stock,,Only match is sold out
+Q34,zeszyt A5 32 kartki do 5 zł,category=zeszyty; max_price=5 PLN; format=A5; kartki=32; in_stock,ZE-A5K-32-CZE ZE-A5K-32-NIE ZE-A5K-32-ZIE ZE-A5K-32-ZOL,
+Q35,zielony zeszyt A4 96 kartek,category=zeszyty; color=zielony; format=A4; kartki=96; in_stock,ZE-A4L-96-ZIE,"Price formatted as '10,99 zł' in 'before'"
+Q36,kołozeszyt A4 w kratkę niebieski,category=zeszyty; color=niebieski; format=A4; liniatura=kratka; in_stock,ZE-A4K-NIE,noindex page in 'before'
+Q37,notes w kropki niebieski,category=zeszyty; color=niebieski; liniatura=kropki; in_stock,ZE-A6D-NIE,SKU missing from feed in 'before'
+Q38,czerwony zeszyt w linie 60 kartek,category=zeszyty; color=czerwony; liniatura=linia; kartki=60; in_stock,ZE-A4L-60-CZE,
+Q39,żółty zeszyt do 4 zł,category=zeszyty; color=zolty; max_price=4 PLN; in_stock,ZE-A5K-32-ZOL,
+Q40,zeszyt w kratkę czarny,category=zeszyty; color=czarny; liniatura=kratka; in_stock,ZE-A4K-CZA,
