@@ -12,6 +12,10 @@ PUBLIC_BASE_URL=${PUBLIC_BASE_URL:?set PUBLIC_BASE_URL, e.g. https://examples.ex
 exec 9>"/run/$NAME.lock"
 flock -n 9 || exit 0
 
+# Pull anonymously: host-wide registry credentials may be scoped to other packages and get denied.
+export DOCKER_CONFIG=${DOCKER_CONFIG:-/var/lib/$NAME/docker-config}
+mkdir -p "$DOCKER_CONFIG"
+
 docker pull -q "$IMAGE" >/dev/null
 new=$(docker image inspect -f '{{.Id}}' "$IMAGE")
 current=$(docker inspect -f '{{.Image}}' "$NAME" 2>/dev/null || true)
