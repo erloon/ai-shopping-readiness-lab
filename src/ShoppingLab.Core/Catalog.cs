@@ -38,6 +38,8 @@ public static class CatalogGenerator
         "KU-POR-450-NIE", "KU-TER-500-CZA", "KU-EMA-BIA", "ZE-A5K-60-ZOL", "ZE-A6D-ROZ",
     ];
 
+    private static string Colors(int n) => n % 10 is >= 2 and <= 4 && n % 100 is < 12 or > 14 ? "kolory" : "kolorów";
+
     private sealed record Group(
         string Id, string Category, string CategoryPath, string Name, string Brand, string Kind,
         string NumberKey, int[] Numbers, string[] Colors, Func<int, decimal> Price,
@@ -46,7 +48,7 @@ public static class CatalogGenerator
     public static IReadOnlyList<Product> Generate()
     {
         var empty = new Dictionary<string, string>();
-        string Crayons(string name, int n, ColorInfo c) => $"{name} {n} kolorów, etui {c.Neuter}";
+        string Crayons(string name, int n, ColorInfo c) => $"{name} {n} {Colors(n)}, etui {c.Neuter}";
         string Bag(string name, int n, ColorInfo c) => $"{name} {n} l, {c.Masculine}";
         string Mug(string name, int n, ColorInfo c) => $"{name} {n} ml, {c.Masculine}";
         string Notebook(string name, int n, ColorInfo c) => $"{name} {n} kartek, okładka {c.Feminine}";
@@ -61,10 +63,10 @@ public static class CatalogGenerator
                 (n, c) => $"Zestaw {n} kredek akwarelowych z pędzelkiem, etui w kolorze {c.Instrumental}."),
             new("KR-SWI", "kredki", "Szkoła i biuro > Kredki > Kredki świecowe", "Kredki świecowe Pastelka", "Pastelka", "swiecowe",
                 "liczba_kolorow", [12, 24], ["niebieski", "zolty", "czerwony"], n => n == 12 ? 14.99m : 24.99m, empty, Crayons,
-                (n, c) => $"Grube kredki świecowe dla najmłodszych, {n} kolorów, etui w kolorze {c.Instrumental}."),
+                (n, c) => $"Grube kredki świecowe dla najmłodszych, {n} {Colors(n)}, etui w kolorze {c.Instrumental}."),
             new("KR-MIN", "kredki", "Szkoła i biuro > Kredki > Kredki ołówkowe", "Kredki ołówkowe Kolorowo Mini", "Kolorowo", "olowkowe",
                 "liczba_kolorow", [12], ["niebieski", "zielony", "rozowy", "fioletowy", "czarny", "czerwony", "zolty"], _ => 12.99m, empty, Crayons,
-                (n, c) => $"Krótkie kredki ołówkowe do piórnika, {n} kolorów, etui w kolorze {c.Instrumental}."),
+                (n, c) => $"Krótkie kredki ołówkowe do piórnika, {n} {Colors(n)}, etui w kolorze {c.Instrumental}."),
 
             new("PL-TRK", "plecaki", "Torby i plecaki > Plecaki > Plecaki szkolne", "Plecak szkolny Trekker", "Trekker", "szkolny",
                 "pojemnosc_l", [20], ["niebieski", "czarny", "zielony", "czerwony", "szary", "rozowy"], _ => 129.00m, empty, Bag,

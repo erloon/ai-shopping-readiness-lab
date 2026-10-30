@@ -1,4 +1,4 @@
-﻿namespace ShoppingLab.Core;
+namespace ShoppingLab.Core;
 
 public sealed record PageRecord
 {
@@ -111,7 +111,7 @@ public static class ScenarioFactory
 
         // D03: wrong currency and a locale-formatted price.
         Feed("KR-SWI-24-ZOL", f => f with { Price = "24.99 EUR" });
-        Feed("ZE-A4L-96-ZIE", f => f with { Price = "10,99 zĹ‚" });
+        Feed("ZE-A4L-96-ZIE", f => f with { Price = "10,99 zł" });
         Add("D03", "feed", "Wrong currency / price not in 'amount CURRENCY' format", "Wrong currency", "KR-SWI-24-ZOL", "ZE-A4L-96-ZIE");
 
         // D04: a missing image file and an empty image field.
@@ -135,7 +135,7 @@ public static class ScenarioFactory
 
         // D08: the lidded mugs are filed under office supplies.
         var lidded = erp.Where(p => p.GroupId == "KU-BIU").Select(p => p.Sku).ToArray();
-        foreach (var sku in lidded) Feed(sku, f => f with { ProductCategory = "SzkoĹ‚a i biuro > ArtykuĹ‚y biurowe" });
+        foreach (var sku in lidded) Feed(sku, f => f with { ProductCategory = "Szkoła i biuro > Artykuły biurowe" });
         Add("D08", "feed", "Ambiguous category: mugs filed under office supplies", "Ambiguous category", lidded);
 
         // D07: two rows with the same item_id.
