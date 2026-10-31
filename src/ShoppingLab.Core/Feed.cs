@@ -38,6 +38,20 @@ public static partial class FeedFormat
     public static readonly string[] RequiredFields = ["item_id", "title", "description", "url", "brand", "seller_name", "image_url", "price", "availability"];
     public static readonly string[] AvailabilityValues = ["in_stock", "out_of_stock", "pre_order", "backorder", "unknown"];
 
+    /// <summary>Feed rows as CSV with OpenAI column names (handy as a sample upload).</summary>
+    public static string ToCsv(IEnumerable<FeedItem> items)
+    {
+        var sb = new StringBuilder();
+        string[] cols = ["item_id", "group_id", "title", "description", "url", "brand", "seller_name", "image_url", "price", "sale_price", "availability", "gtin", "product_category", "color", "size"];
+        sb.Append(string.Join(',', cols)).Append('\n');
+        foreach (var i in items)
+        {
+            string?[] values = [i.ItemId, i.GroupId, i.Title, i.Description, i.Url, i.Brand, i.SellerName, i.ImageUrl, i.Price, i.SalePrice, i.Availability, i.Gtin, i.ProductCategory, i.Color, i.Size];
+            sb.Append(string.Join(',', values.Select(Csv.Escape))).Append('\n');
+        }
+        return sb.ToString();
+    }
+
     public static readonly JsonSerializerOptions Json = new()
     {
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,

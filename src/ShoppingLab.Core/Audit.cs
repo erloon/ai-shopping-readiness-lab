@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Globalization;
 using System.Text.Json.Nodes;
+using System.Text.RegularExpressions;
 using AngleSharp.Html.Parser;
 
 namespace ShoppingLab.Core;
@@ -27,50 +28,41 @@ public sealed record AuditMetrics
     public long ValidationMs { get; init; }
 }
 
-public sealed record AuditReport(string Scenario, DateTimeOffset GeneratedAt, AuditMetrics Metrics, IReadOnlyList<AuditIssue> Issues, IReadOnlyDictionary<string, PageFacts> PagesByItemId, IReadOnlySet<int> RejectedRowIndexes);
+/// <summary>What the crawl could and could not verify. "ok", "missing" or "unreadable" for robots/sitemap.</summary>
+public sealed record AuditCoverage(string Robots, string Sitemap, int SitemapUrls, int PagesChecked, int PagesBlockedByRobots, int RowsNotCrawled);
+
+public sealed record AuditReport(string Scenario, DateTimeOffset GeneratedAt, AuditMetrics Metrics, IReadOnlyList<AuditIssue> Issues, IReadOnlyDictionary<string, PageFacts> PagesByItemId, IReadOnlySet<int> RejectedRowIndexes)
+{
+    public AuditCoverage Coverage { get; init; } = new("ok", "ok", 0, 0, 0, 0);
+}
+
+public sealed record AuditOptions
+{
+    /// <summary>Maximum number of product pages (and their images) fetched. Rows are sampled evenly when the feed is larger.</summary>
+    public int MaxPages { get; init; } = int.MaxValue;
+
+    /// <summary>When true, pages disallowed by robots.txt are reported but not fetched.</summary>
+    public bool RespectRobots { get; init; }
+
+    /// <summary>When false, feed-only rules run and nothing is fetched.</summary>
+    public bool Crawl { get; init; } = true;
+}
 
 public static class Rules
 {
-    public static readonly IReadOnlyDictionary<string, string> Descriptions = new Dictionary<string, string>
-    {
-        ["FEED_REQUIRED_MISSING"] = "One of the 9 required feed fields is missing or empty",
-        ["FEED_PRICE_FORMAT"] = "price is not 'amount CURRENCY' with a decimal point",
-        ["FEED_CURRENCY"] = "Currency differs from the shop currency (PLN)",
-        ["FEED_AVAILABILITY_VALUE"] = "availability is not one of the allowed values",
-        ["FEED_URL_ABSOLUTE"] = "url / image_url is not an absolute http(s) URL",
-        ["FEED_TITLE_LENGTH"] = "title longer than 150 characters",
-        ["FEED_DESCRIPTION_LENGTH"] = "description longer than 5000 characters",
-        ["FEED_DUPLICATE_ID"] = "item_id is not unique",
-        ["FEED_DUPLICATE_TITLE"] = "Several rows share an identical title",
-        ["FEED_VARIANT_DATA"] = "Variant rows lack group_id / listing_has_variations / variant_dict",
-        ["FEED_GTIN"] = "GTIN has an invalid length or check digit",
-        ["FEED_SALE_PRICE"] = "sale_price is not lower than price or uses another currency",
-        ["FEED_MISSING_SKU"] = "SKU exists in ERP but is missing from the feed",
-        ["CONS_PRICE_ERP"] = "Feed price differs from ERP price",
-        ["CONS_AVAILABILITY_ERP"] = "Feed availability differs from ERP stock",
-        ["CONS_PRICE_PAGE"] = "Feed price differs from JSON-LD Offer on the page",
-        ["CONS_AVAILABILITY_PAGE"] = "Feed availability differs from JSON-LD Offer on the page",
-        ["CONS_TITLE_PAGE"] = "Feed title differs from JSON-LD Product name",
-        ["PAGE_HTTP_STATUS"] = "Product URL does not return HTTP 200",
-        ["PAGE_NOINDEX"] = "Product page carries meta robots noindex",
-        ["PAGE_CANONICAL"] = "Canonical URL differs from the feed URL",
-        ["JSONLD_MISSING"] = "No JSON-LD Product on the page",
-        ["JSONLD_OFFER_MISSING"] = "JSON-LD Product has no Offer (price, currency, availability)",
-        ["ACCESS_ROBOTS_BLOCKED"] = "robots.txt disallows the product URL",
-        ["ACCESS_NOT_IN_SITEMAP"] = "Product URL not listed in sitemap.xml",
-        ["IMAGE_UNREACHABLE"] = "image_url does not return an image with HTTP 200",
-    };
+    public static readonly IReadOnlyDictionary<string, string> Descriptions = RuleCatalog.All.ToDictionary(r => r.Id, r => r.TitleEn);
 
     public static readonly HashSet<string> RejectingRules = ["FEED_REQUIRED_MISSING", "FEED_PRICE_FORMAT", "FEED_AVAILABILITY_VALUE", "FEED_DUPLICATE_ID", "FEED_URL_ABSOLUTE"];
 }
 
-/// <summary>Module B: audits a feed against the spec, the ERP data and the live (HTTP) product pages, robots.txt, sitemap and images.</summary>
-public sealed class CatalogAuditor(Func<string, CancellationToken, Task<FetchResult>> fetch)
+/// <summary>Audits a feed against the spec, the ERP data and the live (HTTP) product pages, robots.txt, sitemap and images.</summary>
+public sealed class CatalogAuditor(Func<string, CancellationToken, Task<FetchResult>> fetch, string shopCurrency = CatalogAuditor.ShopCurrency)
 {
     public const string ShopCurrency = "PLN";
 
-    public async Task<AuditReport> AuditAsync(string scenario, string shopBaseUrl, IReadOnlyList<FeedItem> feed, IReadOnlyList<Product> erp, CancellationToken ct = default)
+    public async Task<AuditReport> AuditAsync(string scenario, string shopBaseUrl, IReadOnlyList<FeedItem> feed, IReadOnlyList<Product> erp, CancellationToken ct = default, AuditOptions? options = null)
     {
+        options ??= new AuditOptions();
         var watch = Stopwatch.StartNew();
         var issues = new ConcurrentBag<AuditIssue>();
         var rejected = new HashSet<int>();
@@ -82,7 +74,7 @@ public sealed class CatalogAuditor(Func<string, CancellationToken, Task<FetchRes
         for (var i = 0; i < feed.Count; i++)
         {
             var item = feed[i];
-            var sku = item.ItemId ?? $"row {i + 1}";
+            var sku = string.IsNullOrWhiteSpace(item.ItemId) ? $"row {i + 1}" : item.ItemId;
             var rowRejected = false;
             foreach (var field in FeedFormat.RequiredFields)
             {
@@ -109,9 +101,9 @@ public sealed class CatalogAuditor(Func<string, CancellationToken, Task<FetchRes
                     Add(sku, "FEED_PRICE_FORMAT", "error", "feed", $"price '{item.Price}'");
                     rowRejected = true;
                 }
-                else if (currency != ShopCurrency)
+                else if (currency != shopCurrency)
                 {
-                    Add(sku, "FEED_CURRENCY", "error", "feed", $"price '{item.Price}' (shop currency {ShopCurrency})");
+                    Add(sku, "FEED_CURRENCY", "error", "feed", $"price '{item.Price}' (shop currency {shopCurrency})");
                 }
             }
             if (!string.IsNullOrWhiteSpace(item.Availability) && !FeedFormat.AvailabilityValues.Contains(item.Availability))
@@ -129,12 +121,12 @@ public sealed class CatalogAuditor(Func<string, CancellationToken, Task<FetchRes
             }
             if (item.Title?.Length > 150) Add(sku, "FEED_TITLE_LENGTH", "warning", "feed", $"{item.Title.Length} characters");
             if (item.Description?.Length > 5000) Add(sku, "FEED_DESCRIPTION_LENGTH", "warning", "feed", $"{item.Description.Length} characters");
-            if (item.ItemId is not null && !seenIds.Add(item.ItemId))
+            if (!string.IsNullOrWhiteSpace(item.ItemId) && !seenIds.Add(item.ItemId))
             {
                 Add(sku, "FEED_DUPLICATE_ID", "error", "feed", $"item_id '{item.ItemId}' already used by an earlier row (row {i + 1})");
                 rowRejected = true;
             }
-            if (item.Gtin is not null && !Gtin.IsValid(item.Gtin)) Add(sku, "FEED_GTIN", "error", "feed", $"gtin '{item.Gtin}'");
+            if (!string.IsNullOrWhiteSpace(item.Gtin) && !Gtin.IsValid(item.Gtin)) Add(sku, "FEED_GTIN", "error", "feed", $"gtin '{item.Gtin}'");
             if (!string.IsNullOrWhiteSpace(item.SalePrice))
             {
                 var ok = FeedFormat.TryParseMoney(item.SalePrice, out var sale, out var saleCurrency)
@@ -183,75 +175,92 @@ public sealed class CatalogAuditor(Func<string, CancellationToken, Task<FetchRes
             }
         }
 
-        // Access: robots + sitemap
-        var robots = await fetch(shopBaseUrl.TrimEnd('/') + "/robots.txt", ct);
-        var robotsRules = RobotsTxt.Parse(robots.Status == 200 ? robots.Body : "");
-        var sitemap = await fetch(shopBaseUrl.TrimEnd('/') + "/sitemap.xml", ct);
-        var sitemapUrls = sitemap.Status == 200
-            ? new HtmlParser().ParseDocument(sitemap.Body).QuerySelectorAll("loc").Select(e => e.TextContent.Trim()).ToHashSet()
-            : [];
-
-        // Pages + images, fetched over HTTP
+        var coverage = new AuditCoverage("not checked", "not checked", 0, 0, 0, feed.Count);
         var pages = new ConcurrentDictionary<string, PageFacts>();
-        using var gate = new SemaphoreSlim(8);
-        var tasks = feed.Select(async (item, i) =>
+        if (options.Crawl)
         {
-            if (rejected.Contains(i) || item.ItemId is null || !IsAbsoluteHttp(item.Url)) return;
-            await gate.WaitAsync(ct);
-            try
+            // Access: robots + sitemap(s)
+            var root = shopBaseUrl.TrimEnd('/');
+            var robots = await SafeFetch(root + "/robots.txt", ct);
+            var robotsStatus = robots.Status == 200 ? "ok" : robots.Status is 404 or 410 ? "missing" : "unreadable";
+            var robotsRules = RobotsTxt.Parse(robots.Status == 200 ? robots.Body : "");
+            var (sitemapStatus, sitemapUrls) = await LoadSitemapsAsync(root, robotsRules.Sitemaps, ct);
+
+            var candidates = Enumerable.Range(0, feed.Count)
+                .Where(i => !rejected.Contains(i) && !string.IsNullOrWhiteSpace(feed[i].ItemId) && IsAbsoluteHttp(feed[i].Url))
+                .ToArray();
+            var sample = Sample(candidates, options.MaxPages);
+            var blocked = 0;
+
+            using var gate = new SemaphoreSlim(8);
+            var tasks = sample.Select(async i =>
             {
-                var facts = await InspectAsync(item, robotsRules, sitemapUrls, ct);
-                pages.TryAdd(item.ItemId + "#" + i, facts);
-                var sku = item.ItemId;
-                if (!facts.RobotsAllowed) Add(sku, "ACCESS_ROBOTS_BLOCKED", "error", "access", new Uri(item.Url!).AbsolutePath);
-                if (!facts.InSitemap) Add(sku, "ACCESS_NOT_IN_SITEMAP", "warning", "access", item.Url!);
-                if (facts.ImageStatus != 200 || facts.ImageType?.StartsWith("image/", StringComparison.Ordinal) != true)
+                var item = feed[i];
+                await gate.WaitAsync(ct);
+                try
                 {
-                    Add(sku, "IMAGE_UNREACHABLE", "error", "access", $"HTTP {facts.ImageStatus} {item.ImageUrl}");
-                }
-                if (facts.Status != 200)
-                {
-                    Add(sku, "PAGE_HTTP_STATUS", "error", "page", $"HTTP {facts.Status} {item.Url}");
-                    return;
-                }
-                if (facts.NoIndex) Add(sku, "PAGE_NOINDEX", "error", "page", "meta robots: noindex");
-                if (facts.Canonical != item.Url) Add(sku, "PAGE_CANONICAL", "error", "page", $"canonical {facts.Canonical}");
-                if (!facts.HasProduct)
-                {
-                    Add(sku, "JSONLD_MISSING", "error", "page", "no schema.org Product");
-                    return;
-                }
-                if (!facts.HasOffer)
-                {
-                    Add(sku, "JSONLD_OFFER_MISSING", "error", "page", "Product without offers");
-                }
-                else
-                {
-                    if (FeedFormat.TryParseMoney(item.Price, out var amount, out var currency) && (facts.Price != amount || facts.Currency != currency))
+                    var sku = item.ItemId!;
+                    var allowed = robotsRules.IsAllowed(new Uri(item.Url!).PathAndQuery);
+                    if (!allowed) Add(sku, "ACCESS_ROBOTS_BLOCKED", "error", "access", new Uri(item.Url!).AbsolutePath);
+                    if (sitemapStatus == "ok" && !sitemapUrls.Contains(NormalizeUrl(item.Url!)))
                     {
-                        Add(sku, "CONS_PRICE_PAGE", "error", "consistency", $"feed {item.Price}, page {facts.Price?.ToString("0.00", CultureInfo.InvariantCulture)} {facts.Currency}");
+                        Add(sku, "ACCESS_NOT_IN_SITEMAP", "warning", "access", item.Url!);
                     }
-                    var pageAvailability = facts.Availability?.Replace("https://schema.org/", "").Replace("http://schema.org/", "") switch
+                    if (!allowed && options.RespectRobots)
                     {
-                        "InStock" => "in_stock",
-                        "OutOfStock" => "out_of_stock",
-                        "PreOrder" => "pre_order",
-                        "BackOrder" => "backorder",
-                        var other => other,
-                    };
-                    if (pageAvailability != item.Availability)
+                        Interlocked.Increment(ref blocked);
+                        return;
+                    }
+                    var facts = await InspectAsync(item, allowed, sitemapUrls.Contains(NormalizeUrl(item.Url!)), ct);
+                    pages.TryAdd(sku + "#" + i, facts);
+                    if (facts.ImageStatus != 200 || facts.ImageType?.StartsWith("image/", StringComparison.OrdinalIgnoreCase) != true)
                     {
-                        Add(sku, "CONS_AVAILABILITY_PAGE", "error", "consistency", $"feed {item.Availability}, page {pageAvailability}");
+                        Add(sku, "IMAGE_UNREACHABLE", "error", "access", $"HTTP {facts.ImageStatus} {item.ImageUrl}");
+                    }
+                    if (facts.Status != 200)
+                    {
+                        Add(sku, "PAGE_HTTP_STATUS", "error", "page", $"HTTP {facts.Status} {item.Url}");
+                        return;
+                    }
+                    if (facts.NoIndex) Add(sku, "PAGE_NOINDEX", "error", "page", "meta robots: noindex");
+                    if (facts.Canonical is not null && NormalizeUrl(facts.Canonical) != NormalizeUrl(item.Url!))
+                    {
+                        Add(sku, "PAGE_CANONICAL", "error", "page", $"canonical {facts.Canonical}");
+                    }
+                    if (!facts.HasProduct)
+                    {
+                        Add(sku, "JSONLD_MISSING", "error", "page", "no schema.org Product in the HTML");
+                        return;
+                    }
+                    if (!facts.HasOffer)
+                    {
+                        Add(sku, "JSONLD_OFFER_MISSING", "error", "page", "Product without offers");
+                    }
+                    else
+                    {
+                        if (FeedFormat.TryParseMoney(item.Price, out var amount, out var currency) && (facts.Price != amount || (facts.Currency is not null && facts.Currency != currency)))
+                        {
+                            Add(sku, "CONS_PRICE_PAGE", "error", "consistency", $"feed {item.Price}, page {facts.Price?.ToString("0.00", CultureInfo.InvariantCulture)} {facts.Currency}");
+                        }
+                        var pageAvailability = MapAvailability(facts.Availability);
+                        if (pageAvailability is not null && pageAvailability != item.Availability)
+                        {
+                            Add(sku, "CONS_AVAILABILITY_PAGE", "error", "consistency", $"feed {item.Availability}, page {pageAvailability}");
+                        }
+                    }
+                    if (facts.Name is not null && !string.Equals(facts.Name.Trim(), item.Title?.Trim(), StringComparison.OrdinalIgnoreCase))
+                    {
+                        Add(sku, "CONS_TITLE_PAGE", "warning", "consistency", $"feed '{item.Title}', page '{facts.Name}'");
                     }
                 }
-                if (facts.Name != item.Title) Add(sku, "CONS_TITLE_PAGE", "warning", "consistency", $"feed '{item.Title}', page '{facts.Name}'");
-            }
-            finally
-            {
-                gate.Release();
-            }
-        });
-        await Task.WhenAll(tasks);
+                finally
+                {
+                    gate.Release();
+                }
+            });
+            await Task.WhenAll(tasks);
+            coverage = new AuditCoverage(robotsStatus, sitemapStatus, sitemapUrls.Count, pages.Count, blocked, candidates.Length - sample.Length);
+        }
         watch.Stop();
 
         var list = issues.OrderBy(i => i.Sku, StringComparer.Ordinal).ThenBy(i => i.Rule, StringComparer.Ordinal).ThenBy(i => i.Message, StringComparer.Ordinal).ToArray();
@@ -270,58 +279,176 @@ public sealed class CatalogAuditor(Func<string, CancellationToken, Task<FetchRes
             RowsWithErrors = list.Where(i => i.Severity == "error").Select(i => i.Sku).Distinct().Count(),
             ValidationMs = watch.ElapsedMilliseconds,
         };
-        return new AuditReport(scenario, DateTimeOffset.UtcNow, metrics, list, pagesByItem, rejected);
+        return new AuditReport(scenario, DateTimeOffset.UtcNow, metrics, list, pagesByItem, rejected) { Coverage = coverage };
     }
 
-    private async Task<PageFacts> InspectAsync(FeedItem item, RobotsTxt robots, HashSet<string> sitemap, CancellationToken ct)
+    /// <summary>Evenly spaced sample that keeps the first row, so results are stable between runs.</summary>
+    public static int[] Sample(int[] indexes, int max)
+    {
+        if (indexes.Length <= max) return indexes;
+        return Enumerable.Range(0, max).Select(k => indexes[(int)((long)k * indexes.Length / max)]).ToArray();
+    }
+
+    private async Task<FetchResult> SafeFetch(string url, CancellationToken ct)
+    {
+        try
+        {
+            return await fetch(url, ct);
+        }
+        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or InvalidOperationException)
+        {
+            return new FetchResult(0, null, "");
+        }
+    }
+
+    private async Task<(string Status, HashSet<string> Urls)> LoadSitemapsAsync(string root, IReadOnlyList<string> declared, CancellationToken ct)
+    {
+        var urls = new HashSet<string>(StringComparer.Ordinal);
+        var queue = new Queue<string>(declared.Count > 0 ? declared.Take(3) : [root + "/sitemap.xml"]);
+        var fetched = 0;
+        var anyOk = false;
+        var complete = true;
+        var parser = new HtmlParser();
+        while (queue.Count > 0)
+        {
+            var url = queue.Dequeue();
+            if (fetched >= 6)
+            {
+                complete = false;
+                break;
+            }
+            fetched++;
+            var result = await SafeFetch(url, ct);
+            if (result.Status != 200)
+            {
+                complete = false;
+                continue;
+            }
+            anyOk = true;
+            var document = parser.ParseDocument(result.Body);
+            var isIndex = document.QuerySelector("sitemapindex") is not null;
+            foreach (var loc in document.QuerySelectorAll("loc").Select(e => e.TextContent.Trim()))
+            {
+                if (isIndex) queue.Enqueue(loc);
+                else urls.Add(NormalizeUrl(loc));
+            }
+        }
+        if (!anyOk) return (fetched == 1 ? "missing" : "unreadable", urls);
+        return (complete ? "ok" : "partial", urls);
+    }
+
+    private async Task<PageFacts> InspectAsync(FeedItem item, bool allowed, bool inSitemap, CancellationToken ct)
     {
         var url = item.Url!;
-        var allowed = robots.IsAllowed(new Uri(url).AbsolutePath);
-        var page = await fetch(url, ct);
+        var page = await SafeFetch(url, ct);
         var imageStatus = 0;
         string? imageType = null;
         if (IsAbsoluteHttp(item.ImageUrl))
         {
-            var image = await fetch(item.ImageUrl!, ct);
+            var image = await SafeFetch(item.ImageUrl!, ct);
             imageStatus = image.Status;
             imageType = image.ContentType;
         }
         if (page.Status != 200)
         {
-            return new PageFacts(url, page.Status, false, null, false, false, null, null, null, null, allowed, sitemap.Contains(url), imageStatus, imageType);
+            return new PageFacts(url, page.Status, false, null, false, false, null, null, null, null, allowed, inSitemap, imageStatus, imageType);
         }
         var document = new HtmlParser().ParseDocument(page.Body);
-        var robotsMeta = document.QuerySelector("meta[name=robots]")?.GetAttribute("content") ?? "";
-        var canonical = document.QuerySelector("link[rel=canonical]")?.GetAttribute("href");
+        var robotsMeta = string.Join(",", document.QuerySelectorAll("meta[name=robots], meta[name=googlebot]").Select(m => m.GetAttribute("content") ?? ""));
+        var canonicalHref = document.QuerySelector("link[rel=canonical]")?.GetAttribute("href");
+        string? canonical = canonicalHref is null ? null : Uri.TryCreate(new Uri(url), canonicalHref, out var resolved) ? resolved.ToString() : canonicalHref;
+
         JsonObject? product = null;
         foreach (var script in document.QuerySelectorAll("script[type='application/ld+json']"))
         {
             try
             {
-                if (JsonNode.Parse(script.TextContent) is JsonObject node && node["@type"]?.GetValue<string>() == "Product")
-                {
-                    product = node;
-                }
+                product ??= FindProduct(JsonNode.Parse(script.TextContent), item.ItemId);
             }
             catch (System.Text.Json.JsonException)
             {
             }
         }
-        var offer = product?["offers"] as JsonObject;
-        decimal? price = decimal.TryParse(offer?["price"]?.ToString(), NumberStyles.Number, CultureInfo.InvariantCulture, out var parsed) ? parsed : null;
+        var offer = FirstOffer(product?["offers"], item.ItemId);
+        var priceText = offer?["price"]?.ToString() ?? offer?["lowPrice"]?.ToString();
+        decimal? price = decimal.TryParse(priceText?.Replace(',', '.'), NumberStyles.Number, CultureInfo.InvariantCulture, out var parsed) ? parsed : null;
         return new PageFacts(url, page.Status, robotsMeta.Contains("noindex", StringComparison.OrdinalIgnoreCase), canonical, product is not null, offer is not null,
-            product?["name"]?.GetValue<string>(), price, offer?["priceCurrency"]?.GetValue<string>(), offer?["availability"]?.GetValue<string>(),
-            allowed, sitemap.Contains(url), imageStatus, imageType);
+            Str(product?["name"]), price, Str(offer?["priceCurrency"]), Str(offer?["availability"]), allowed, inSitemap, imageStatus, imageType);
     }
 
-    private static bool IsAbsoluteHttp(string? value) =>
+    private static string? Str(JsonNode? node) => node is JsonValue v && v.TryGetValue<string>(out var s) ? s : null;
+
+    private static bool IsType(JsonObject node, params string[] types) => node["@type"] switch
+    {
+        JsonValue v when v.TryGetValue<string>(out var t) => types.Contains(t),
+        JsonArray a => a.Any(x => x is JsonValue v && v.TryGetValue<string>(out var t) && types.Contains(t)),
+        _ => false,
+    };
+
+    /// <summary>Finds a Product in plain objects, arrays, @graph and ProductGroup.hasVariant (preferring the matching sku).</summary>
+    public static JsonObject? FindProduct(JsonNode? node, string? sku)
+    {
+        var found = new List<JsonObject>();
+        void Walk(JsonNode? n, int depth)
+        {
+            if (n is null || depth > 6) return;
+            if (n is JsonArray array)
+            {
+                foreach (var child in array) Walk(child, depth + 1);
+                return;
+            }
+            if (n is not JsonObject obj) return;
+            if (IsType(obj, "Product")) found.Add(obj);
+            Walk(obj["@graph"], depth + 1);
+            if (IsType(obj, "ProductGroup")) Walk(obj["hasVariant"], depth + 1);
+        }
+        Walk(node, 0);
+        return found.FirstOrDefault(p => sku is not null && Str(p["sku"]) == sku) ?? found.FirstOrDefault();
+    }
+
+    private static JsonObject? FirstOffer(JsonNode? offers, string? sku) => offers switch
+    {
+        JsonObject o when IsType(o, "AggregateOffer") && o["offers"] is { } inner => FirstOffer(inner, sku) ?? o,
+        JsonObject o => o,
+        JsonArray a => a.OfType<JsonObject>().FirstOrDefault(o => sku is not null && Str(o["sku"]) == sku) ?? a.OfType<JsonObject>().FirstOrDefault(),
+        _ => null,
+    };
+
+    public static string? MapAvailability(string? schema)
+    {
+        if (schema is null) return null;
+        var value = schema.Trim();
+        var slash = value.LastIndexOf('/');
+        if (slash >= 0) value = value[(slash + 1)..];
+        return value.ToLowerInvariant() switch
+        {
+            "instock" or "instoreonly" or "onlineonly" or "limitedavailability" => "in_stock",
+            "outofstock" or "soldout" or "discontinued" => "out_of_stock",
+            "preorder" or "presale" => "pre_order",
+            "backorder" => "backorder",
+            _ => null,
+        };
+    }
+
+    /// <summary>Compares URLs ignoring scheme case, host case, fragment and a trailing slash.</summary>
+    public static string NormalizeUrl(string url)
+    {
+        if (!Uri.TryCreate(url.Trim(), UriKind.Absolute, out var uri)) return url.Trim();
+        var path = uri.AbsolutePath.Length > 1 ? uri.AbsolutePath.TrimEnd('/') : "";
+        return $"{uri.Scheme.ToLowerInvariant()}://{uri.Host.ToLowerInvariant()}{(uri.IsDefaultPort ? "" : ":" + uri.Port)}{path}{uri.Query}";
+    }
+
+    public static bool IsAbsoluteHttp(string? value) =>
         Uri.TryCreate(value, UriKind.Absolute, out var uri) && (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps);
 }
 
-/// <summary>Minimal robots.txt evaluation for the "*" group: longest matching Allow/Disallow prefix wins.</summary>
+/// <summary>robots.txt evaluation for the "*" group: longest matching Allow/Disallow wins; supports * and $ wildcards and Sitemap lines.</summary>
 public sealed class RobotsTxt
 {
-    private readonly List<(string Path, bool Allow)> rules = [];
+    private readonly List<(string Path, Regex Pattern, bool Allow)> rules = [];
+    private readonly List<string> sitemaps = [];
+
+    public IReadOnlyList<string> Sitemaps => sitemaps;
 
     public static RobotsTxt Parse(string text)
     {
@@ -335,6 +462,11 @@ public sealed class RobotsTxt
             if (colon < 0) continue;
             var key = line[..colon].Trim().ToLowerInvariant();
             var value = line[(colon + 1)..].Trim();
+            if (key == "sitemap")
+            {
+                if (CatalogAuditor.IsAbsoluteHttp(value)) result.sitemaps.Add(value);
+                continue;
+            }
             if (key == "user-agent")
             {
                 applies = (lastWasAgent && applies) || value == "*";
@@ -344,7 +476,9 @@ public sealed class RobotsTxt
             lastWasAgent = false;
             if (applies && key is "allow" or "disallow" && value.Length > 0)
             {
-                result.rules.Add((value, key == "allow"));
+                var pattern = "^" + Regex.Escape(value).Replace("\\*", ".*").Replace("\\$", "$");
+                if (pattern.EndsWith("$$", StringComparison.Ordinal)) pattern = pattern[..^1];
+                result.rules.Add((value, new Regex(pattern, RegexOptions.CultureInvariant, TimeSpan.FromMilliseconds(50)), key == "allow"));
             }
         }
         return result;
@@ -352,7 +486,19 @@ public sealed class RobotsTxt
 
     public bool IsAllowed(string path)
     {
-        var match = rules.Where(r => path.StartsWith(r.Path, StringComparison.Ordinal)).OrderByDescending(r => r.Path.Length).ThenByDescending(r => r.Allow).FirstOrDefault();
+        var match = rules.Where(r => SafeMatch(r.Pattern, path)).OrderByDescending(r => r.Path.Length).ThenByDescending(r => r.Allow).FirstOrDefault();
         return match.Path is null || match.Allow;
+    }
+
+    private static bool SafeMatch(Regex regex, string path)
+    {
+        try
+        {
+            return regex.IsMatch(path);
+        }
+        catch (RegexMatchTimeoutException)
+        {
+            return false;
+        }
     }
 }

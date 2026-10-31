@@ -10,7 +10,11 @@ public sealed record PageRecord
     public bool JsonLdOffer { get; init; } = true;
 }
 
-public sealed record Defect(string Code, string Layer, string Title, string EdgeCase, IReadOnlyList<string> Skus);
+public sealed record Defect(string Code, string Layer, string Title, string EdgeCase, IReadOnlyList<string> Skus)
+{
+    public string TitlePl => ScenarioFactory.DefectsPl.TryGetValue(Code, out var pl) ? pl.Title : Title;
+    public string EdgeCasePl => ScenarioFactory.DefectsPl.TryGetValue(Code, out var pl) ? pl.EdgeCase : EdgeCase;
+}
 
 /// <summary>A demo shop: ERP truth, rendered product pages, a feed snapshot, robots.txt and a sitemap.</summary>
 public sealed class ShopScenario
@@ -36,6 +40,27 @@ public static class ScenarioFactory
 {
     public const string Before = "before";
     public const string After = "after";
+
+    public static readonly IReadOnlyDictionary<string, (string Title, string EdgeCase)> DefectsPl = new Dictionary<string, (string, string)>
+    {
+        ["D01"] = ("Feed mówi in_stock, a magazyn i strona: brak towaru", "Wyprzedany wariant"),
+        ["D02"] = ("Stara cena w feedzie (po promocji)", "Nieaktualna cena"),
+        ["D03"] = ("Zła waluta / cena nie w formacie \"kwota WALUTA\"", "Zła waluta"),
+        ["D04"] = ("Brak zdjęcia (404) albo puste image_url", "Brak zdjęcia"),
+        ["D05"] = ("Puste wymagane pole (marka, opis)", "Niepełny rekord"),
+        ["D06"] = ("Warianty z jednym tytułem; kolor tylko odmieniony w opisie", "Identyczne nazwy + odmiana"),
+        ["D07"] = ("Powtórzone item_id (drugi wiersz nadpisuje inny wariant)", "Zdublowany identyfikator"),
+        ["D08"] = ("Niejasna kategoria: kubki w artykułach biurowych", "Niejasna kategoria"),
+        ["D09"] = ("Strona produktu ma meta robots noindex", "Ukryta strona"),
+        ["D10"] = ("Canonical wskazuje inny wariant", "Zły canonical"),
+        ["D11"] = ("Link z feedu zwraca 404 (stary adres)", "Zepsuty link"),
+        ["D12"] = ("robots.txt blokuje strony kubków emaliowanych", "Zablokowany robot"),
+        ["D13"] = ("Produkty brakują w sitemap.xml", "Niepełna mapa strony"),
+        ["D14"] = ("GTIN z błędną cyfrą kontrolną", "Błędny identyfikator"),
+        ["D15"] = ("JSON-LD Product bez oferty (cena/dostępność)", "Niepełne dane strukturalne"),
+        ["D16"] = ("sale_price wyższa niż price", "Błędna promocja"),
+        ["D17"] = ("SKU w ERP, ale brak w feedzie", "Brakujący produkt"),
+    };
 
     public static FeedItem ToFeedItem(Product p, Func<string, string> absolute, string shopPath) => new()
     {

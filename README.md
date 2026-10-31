@@ -1,8 +1,8 @@
 # AI Shopping Readiness Lab
 
 **Can a shopping agent correctly find a product in a small online store?** This .NET 10 proof of concept
-audits a fictional 100-SKU catalog — the product feed, the product pages with JSON-LD, robots.txt, sitemap and
-images — and measures 40 shopping queries **before** and **after** fixing the data.
+audits a fictional 100-SKU catalog - the product feed, the product pages with JSON-LD, robots.txt, sitemap and
+images - and measures 40 shopping queries **before** and **after** fixing the data.
 
 - Live demo: <https://examples.sparkdata.pl/ai-shopping-readiness-lab/>
 - Article (PL): <https://sparkdata.pl/pl/blog/gotowosc-katalogu-produktow-na-agentow-ai/>
@@ -12,9 +12,9 @@ images — and measures 40 shopping queries **before** and **after** fixing the 
 
 Separate three questions that are often mixed up:
 
-1. **Is the product described correctly?** (feed fields, variants, identifiers, structured data) — measurable here.
-2. **Can a system fetch it?** (HTTP status, robots.txt, noindex, canonical, sitemap, images) — measurable here.
-3. **Will a platform actually show it?** — **not** measurable with a local lab. It depends on the platform, the
+1. **Is the product described correctly?** (feed fields, variants, identifiers, structured data) - measurable here.
+2. **Can a system fetch it?** (HTTP status, robots.txt, noindex, canonical, sitemap, images) - measurable here.
+3. **Will a platform actually show it?** - **not** measurable with a local lab. It depends on the platform, the
    market, partner onboarding, the account and time.
 
 ## Limitations (read first)
@@ -101,7 +101,7 @@ rejects a row; the lab applies the same treatment to the other blocking errors a
 ### Golden set and metrics
 
 40 Polish shopping queries (`results/golden-set.csv`), e.g. `niebieskie kredki 12 kolorów do 30 zł`. Four of them
-have no correct answer because the only matching variant is sold out — the right result is “nothing”.
+have no correct answer because the only matching variant is sold out - the right result is “nothing”.
 
 - **precision@3** – correct results in the top 3 / number returned in the top 3 (1 if nothing is expected and nothing is returned).
 - **recall@5** – correct results in the top 5 / min(5, expected).
@@ -122,7 +122,7 @@ have no correct answer because the only matching variant is sold out — the rig
 | Mean recall@5 | 0.810 | 1.000 |
 | Queries meeting every constraint | 80% | 100% |
 | Top-3 results with a broken landing page | 7 | 0 |
-| Field-level fixes from before to after | 63 | — |
+| Field-level fixes from before to after | 63 | - |
 
 Raw files: [`results/`](results/) (`metrics.csv`, `results.csv`, `issues-before.csv`, HTML and JSON reports, both feeds).
 The “after” score of 1.0 is expected by construction: the answer key and the clean feed come from the same ERP
@@ -145,9 +145,9 @@ on feed/page drift, an import adapter for a real shop export (PIM/ERP), multi-ma
 
 ## Sources
 
-- OpenAI — [Products feed spec](https://developers.openai.com/commerce/specs/file-upload/products),
+- OpenAI - [Products feed spec](https://developers.openai.com/commerce/specs/file-upload/products),
   [File upload overview](https://developers.openai.com/commerce/specs/file-upload/overview),
   [Get started](https://developers.openai.com/commerce/guides/get-started)
-- Google Search Central — [Merchant listing structured data](https://developers.google.com/search/docs/appearance/structured-data/merchant-listing)
+- Google Search Central - [Merchant listing structured data](https://developers.google.com/search/docs/appearance/structured-data/merchant-listing)
 
 License: MIT. Author: Maciej Kryca, [sparkdata.pl](https://sparkdata.pl).

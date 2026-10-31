@@ -40,3 +40,32 @@ textarea{width:100%;font-family:ui-monospace,Consolas,monospace;font-size:.82rem
 .downloads li{margin:.25rem 0}
 footer{padding:2rem 1.25rem 3rem}
 .bar{height:6px;background:var(--chip);border-radius:3px;margin-top:3px;overflow:hidden}.bar i{display:block;height:100%;background:var(--accent)}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:1rem}
+.lang{display:flex;border:1px solid #4a5060;border-radius:8px;overflow:hidden}
+.lang button{background:transparent;color:#d7dae2;border:0;padding:.35rem .7rem;font:inherit;font-weight:600;cursor:pointer}
+.lang button[aria-pressed="true"]{background:#fff;color:#14171f}
+.tabs{display:flex;gap:.3rem;flex-wrap:wrap;margin-top:1.2rem;border-bottom:1px solid var(--line)}
+.tabs button{background:none;border:0;border-bottom:3px solid transparent;padding:.7rem .9rem;font:inherit;font-weight:600;color:var(--muted);cursor:pointer}
+.tabs button[aria-selected="true"]{color:var(--fg);border-bottom-color:var(--accent)}
+.tab{margin-top:1.4rem}
+.card+.card,.card+#checkResult{margin-top:1rem}
+.card h2{margin-top:0}.card h3{margin:1rem 0 .3rem;font-size:1rem}
+.row{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center;margin:.8rem 0}
+.file{display:inline-flex;flex-direction:row;cursor:pointer}
+.file input{position:absolute;opacity:0;width:1px;height:1px}
+.file span{border:1px dashed #9aa1ae;border-radius:8px;padding:.55rem .95rem;background:#fff}
+.file:focus-within span{outline:3px solid #2f6fdb;outline-offset:2px}
+label.inline{flex-direction:row;align-items:center;gap:.5rem;font-weight:500;margin:.4rem 0 .8rem}
+.score{display:flex;gap:1.5rem;align-items:center;flex-wrap:wrap}
+.score .big{font-size:3.2rem;font-weight:800;line-height:1}
+.score .big small{font-size:1.1rem;color:var(--muted);font-weight:600}
+.kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:.6rem;margin:1rem 0}
+.kv div{background:#f6f7f9;border-radius:8px;padding:.6rem .7rem}.kv b{display:block;font-size:1.15rem}
+.issue{border:1px solid var(--line);border-radius:10px;padding:.8rem 1rem;margin:.6rem 0;background:#fff}
+.issue h3{margin:0 0 .3rem;font-size:1rem;display:flex;gap:.5rem;flex-wrap:wrap;align-items:center}
+.issue p{margin:.25rem 0}
+.sev{font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;border-radius:5px;padding:.05rem .4rem}
+.sev.error{background:#fde2df;color:var(--bad)}.sev.warning{background:#fff1d6;color:#8a5a00}
+.flow li::before{counter-increment:s;content:counter(s);display:inline-grid;place-items:center;width:1.6rem;height:1.6rem;border-radius:50%;background:var(--accent);color:#fff;font-weight:700;margin-bottom:.3rem}
+.flow{margin-bottom:1.5rem}
+.issues-title{margin-top:1.5rem}

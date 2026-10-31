@@ -137,7 +137,7 @@ public static class CatalogGenerator
                         Category = group.Category,
                         CategoryPath = group.CategoryPath,
                         Title = title,
-                        Description = $"{group.Sentence(number, color)} Marka {group.Brand}. Produkt demonstracyjny — dane fikcyjne.",
+                        Description = $"{group.Sentence(number, color)} Marka {group.Brand}. Produkt demonstracyjny - dane fikcyjne.",
                         Brand = group.Brand,
                         Color = colorKey,
                         Attributes = attributes,
@@ -230,7 +230,7 @@ public static class Csv
         return value.IndexOfAny([',', '"', '\n', '\r']) >= 0 ? "\"" + value.Replace("\"", "\"\"") + "\"" : value;
     }
 
-    public static List<string[]> Parse(string text)
+    public static List<string[]> Parse(string text, char delimiter = ',')
     {
         var rows = new List<string[]>();
         var row = new List<string>();
@@ -246,7 +246,7 @@ public static class Csv
                 else { cell.Append(ch); }
             }
             else if (ch == '"') { quoted = true; }
-            else if (ch == ',') { row.Add(cell.ToString()); cell.Clear(); }
+            else if (ch == delimiter) { row.Add(cell.ToString()); cell.Clear(); }
             else if (ch == '\n')
             {
                 row.Add(cell.ToString().TrimEnd('\r')); cell.Clear();

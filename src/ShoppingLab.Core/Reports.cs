@@ -65,7 +65,7 @@ public static class Reports
             th{"{"}background:#f3f4f6{"}"}.error{"{"}color:#a40000{"}"}.warning{"{"}color:#8a5a00{"}"}.kpi{"{"}display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:.5rem{"}"}
             .kpi div{"{"}background:#f3f4f6;border-radius:8px;padding:.6rem{"}"}.kpi b{"{"}display:block;font-size:1.4rem{"}"}</style></head><body>
             <p><a href="{H(basePath)}/">← AI Shopping Readiness Lab</a></p>
-            <h1>Audit report — scenario “{H(r.Scenario)}”</h1><p>{H(r.Label)}. Generated {H(r.Audit.GeneratedAt.ToString("u", CultureInfo.InvariantCulture))}. Demo data only.</p>
+            <h1>Audit report - scenario “{H(r.Scenario)}”</h1><p>{H(r.Label)}. Generated {H(r.Audit.GeneratedAt.ToString("u", CultureInfo.InvariantCulture))}. Demo data only.</p>
             <div class="kpi">
             <div>Required-field completeness<b>{H(m.RequiredFieldCompleteness)}%</b></div><div>Feed rows / ERP SKUs<b>{m.FeedRows} / {m.ErpSkus}</b></div>
             <div>Price/stock inconsistencies<b>{m.Inconsistencies}</b></div><div>Unreachable URLs<b>{m.UnreachableUrls}</b></div>

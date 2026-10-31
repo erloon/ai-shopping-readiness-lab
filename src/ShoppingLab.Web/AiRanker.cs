@@ -8,6 +8,8 @@ namespace ShoppingLab.Web;
 
 public sealed record AiRankRequest(string Provider, string Model, string ApiKey, string Scenario, string QueryId, string? Text);
 
+public sealed record CheckRequest(string Csv, Dictionary<string, string>? Mapping, string? ShopUrl, string? SellerName, string? Brand, string? Currency, bool Crawl = true);
+
 /// <summary>
 /// Optional comparison: asks a user-selected LLM to pick SKUs from the same eligible feed rows.
 /// The API key comes from the visitor, is used for this single request and is never stored or logged.
