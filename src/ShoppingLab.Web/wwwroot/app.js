@@ -53,7 +53,7 @@ const I18N = {
     fileLoaded: (n, rows, d) => `Wczytano ${n}: ${rows} wierszy, separator "${d}".`,
     notMapped: "(brak)", required: "wymagane",
     errorCodes: { "empty-file": "Plik jest pusty.", "bad-currency": "Waluta musi mieć 3 litery, np. PLN.", "no-rows": "Nie znaleziono żadnych wierszy z danymi.", "bad-shop-url": "Adres sklepu musi być publicznym adresem http(s).", busy: "Narzędzie jest teraz zajęte. Spróbuj za chwilę.", rate: "Za dużo audytów w krótkim czasie. Spróbuj za kilka minut." },
-    scoreLabel: "Wynik gotowości", scoreHint: (s) => s >= 90 ? "Bardzo dobrze. Dane są w dobrej kondycji." : s >= 70 ? "Nieźle, ale są rzeczy do poprawy." : s >= 40 ? "Sporo do poprawy. Zacznij od błędów na górze listy." : "Dane wymagają porządków, zanim agent AI je wykorzysta.",
+    scoreLabel: "Wynik gotowości", scoreHint: (s, e) => s >= 90 && e ? "Blisko, ale błędy poniżej mogą wykluczyć część produktów. Warto je poprawić." : s >= 90 ? "Bardzo dobrze. Dane są w dobrej kondycji." : s >= 70 ? "Nieźle, ale są rzeczy do poprawy." : s >= 40 ? "Sporo do poprawy. Zacznij od błędów na górze listy." : "Dane wymagają porządków, zanim agent AI je wykorzysta.",
     rows: "Wiersze sprawdzone", rowsOf: (a, t) => `${a} z ${t}`, feedOk: "Wiersze feedu bez błędów", pagesOk: "Strony bez błędów", accessOk: "Dostęp dla robotów",
     robots: "robots.txt", sitemap: "Mapa strony", pagesChecked: "Sprawdzone strony", blocked: "zablokowane przez robots.txt",
     status: { ok: "OK", missing: "brak", unreadable: "nie udało się odczytać", partial: "częściowo", "not checked": "nie sprawdzano" },
@@ -143,7 +143,7 @@ const I18N = {
     fileLoaded: (n, rows, d) => `Loaded ${n}: ${rows} rows, delimiter "${d}".`,
     notMapped: "(none)", required: "required",
     errorCodes: { "empty-file": "The file is empty.", "bad-currency": "Currency must be 3 letters, e.g. PLN.", "no-rows": "No data rows found.", "bad-shop-url": "The shop address must be a public http(s) address.", busy: "The tool is busy right now. Try again in a moment.", rate: "Too many audits in a short time. Try again in a few minutes." },
-    scoreLabel: "Readiness score", scoreHint: (s) => s >= 90 ? "Very good. Your data is in good shape." : s >= 70 ? "Not bad, but there is room to improve." : s >= 40 ? "Plenty to fix. Start with the errors at the top." : "The data needs cleaning before an AI agent can use it.",
+    scoreLabel: "Readiness score", scoreHint: (s, e) => s >= 90 && e ? "Close, but the errors below can exclude some products. Worth fixing." : s >= 90 ? "Very good. Your data is in good shape." : s >= 70 ? "Not bad, but there is room to improve." : s >= 40 ? "Plenty to fix. Start with the errors at the top." : "The data needs cleaning before an AI agent can use it.",
     rows: "Rows checked", rowsOf: (a, t) => `${a} of ${t}`, feedOk: "Feed rows without errors", pagesOk: "Pages without errors", accessOk: "Crawler access",
     robots: "robots.txt", sitemap: "Sitemap", pagesChecked: "Pages checked", blocked: "blocked by robots.txt",
     status: { ok: "OK", missing: "missing", unreadable: "could not read", partial: "partial", "not checked": "not checked" },
@@ -315,7 +315,7 @@ function renderCheck(d) {
       <details><summary>${esc(t("examples"))}</summary><ul>${g.examples.map((e) => `<li><span class="chip">${esc(e.sku)}</span> ${esc(e.message)}</li>`).join("")}</ul></details></div>`;
   }).join("");
   $("#checkResult").innerHTML = `<div class="card">
-    <div class="score"><div class="big ${s.score >= 70 ? "good" : "bad"}">${s.score}<small>/100</small></div><div><b>${esc(t("scoreLabel"))}</b><br>${esc(t("scoreHint")(s.score))}</div></div>
+    <div class="score"><div class="big ${s.score >= 90 ? "good" : s.score >= 70 ? "" : "bad"}">${s.score}<small>/100</small></div><div><b>${esc(t("scoreLabel"))}</b><br>${esc(t("scoreHint")(s.score, d.groups.some((g) => g.severity === "error")))}</div></div>
     <div class="kv">
       <div>${esc(t("rows"))}<b>${esc(t("rowsOf")(d.auditedRows, d.totalRows))}</b></div>
       <div>${esc(t("feedOk"))}<b>${pct(s.feedRowsOk)}</b></div>
